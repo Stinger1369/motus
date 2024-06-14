@@ -1,0 +1,70 @@
+.game-container {
+  text-align: center;
+}
+
+.game-board {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin: 20px 0;
+  background-color: #87ceeb;
+  padding: 10px;
+  border: 2px solid #fff;
+}
+
+.board-row {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 5px;
+}
+
+.tile {
+  width: 50px;
+  height: 50px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 24px;
+  font-weight: bold;
+  color: white;
+  background-color: #1e90ff;
+  border: 2px solid white;
+  text-align: center;
+  text-transform: uppercase;
+}
+
+.tile.correct {
+  background-color: red;
+}
+
+.tile.misplaced {
+  background-color: yellow;
+  border-radius: 50%;
+}
+
+.tile.incorrect {
+  background-color: blue;
+}
+
+button {
+  margin: 10px;
+  padding: 10px 20px;
+  background-color: #1e90ff;
+  color: white;
+  border: none;
+  cursor: pointer;
+  font-size: 16px;
+}
+
+button:disabled {
+  background-color: gray;
+  cursor: not-allowed;
+}
+
+input[type="number"] {
+  width: 50px;
+  padding: 5px;
+  font-size: 16px;
+  margin-right: 10px;
+}
