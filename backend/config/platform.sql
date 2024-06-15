@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Hôte : 127.0.0.1
--- Généré le : ven. 14 juin 2024 à 20:57
+-- Généré le : sam. 15 juin 2024 à 15:14
 -- Version du serveur : 10.4.32-MariaDB
 -- Version de PHP : 8.2.12
 
@@ -88,18 +88,6 @@ INSERT INTO `users` (`id`, `pseudo`, `password`, `numero_secu`, `totalScore`) VA
 -- --------------------------------------------------------
 
 --
--- Structure de la table `walloffame`
---
-
-CREATE TABLE `walloffame` (
-  `id` int(11) NOT NULL,
-  `Scores` int(11) NOT NULL,
-  `login` varchar(255) DEFAULT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-
--- --------------------------------------------------------
-
---
 -- Structure de la table `walloffames`
 --
 
@@ -116,18 +104,21 @@ CREATE TABLE `walloffames` (
 --
 
 INSERT INTO `walloffames` (`id`, `Scores`, `login`, `createdAt`, `updatedAt`) VALUES
-(1, 66, 'azerty', '2024-06-13 14:19:32', '2024-06-13 14:19:32'),
-(2, 165, 'azerty', '2024-06-13 14:20:07', '2024-06-13 14:20:07'),
 (3, 70, 'kaka', '2024-06-13 14:22:40', '2024-06-13 14:22:40'),
 (4, 165, 'kaka', '2024-06-13 14:24:16', '2024-06-13 14:24:16'),
 (5, 18, 'kaka', '2024-06-13 14:25:43', '2024-06-13 14:25:43'),
 (6, 154, 'kaka', '2024-06-13 14:27:41', '2024-06-13 14:27:41'),
-(7, 8, 'azerty', '2024-06-14 08:10:30', '2024-06-14 08:10:30'),
-(8, 4, 'azerty', '2024-06-14 08:11:01', '2024-06-14 08:11:01'),
-(9, 2, 'azerty', '2024-06-14 08:11:33', '2024-06-14 08:11:33'),
-(10, 1, 'azerty', '2024-06-14 08:12:05', '2024-06-14 08:12:05'),
-(11, 33, 'azerty', '2024-06-14 08:15:38', '2024-06-14 08:15:38'),
-(12, 110, 'azerty', '2024-06-14 08:26:20', '2024-06-14 08:26:20');
+(14, 0, 'azerty', '2024-06-15 13:02:01', '2024-06-15 13:02:01'),
+(15, 0, 'azerty', '2024-06-15 13:02:10', '2024-06-15 13:02:10'),
+(16, 396, 'azerty', '2024-06-15 13:02:20', '2024-06-15 13:02:20'),
+(17, 0, 'azerty', '2024-06-15 13:06:46', '2024-06-15 13:06:46'),
+(18, 0, 'azerty', '2024-06-15 13:07:03', '2024-06-15 13:07:03'),
+(19, 0, 'azerty', '2024-06-15 13:07:07', '2024-06-15 13:07:07'),
+(20, 176, 'azerty', '2024-06-15 13:07:12', '2024-06-15 13:07:12'),
+(21, 0, 'azerty', '2024-06-15 13:13:11', '2024-06-15 13:13:11'),
+(22, 0, 'azerty', '2024-06-15 13:13:13', '2024-06-15 13:13:13'),
+(23, 0, 'azerty', '2024-06-15 13:13:14', '2024-06-15 13:13:14'),
+(24, 220, 'azerty', '2024-06-15 13:13:25', '2024-06-15 13:13:25');
 
 --
 -- Index pour les tables déchargées
@@ -148,13 +139,6 @@ ALTER TABLE `users`
   ADD UNIQUE KEY `pseudo` (`pseudo`);
 
 --
--- Index pour la table `walloffame`
---
-ALTER TABLE `walloffame`
-  ADD PRIMARY KEY (`id`),
-  ADD KEY `login` (`login`);
-
---
 -- Index pour la table `walloffames`
 --
 ALTER TABLE `walloffames`
@@ -168,7 +152,7 @@ ALTER TABLE `walloffames`
 -- AUTO_INCREMENT pour la table `mots`
 --
 ALTER TABLE `mots`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=41;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=42;
 
 --
 -- AUTO_INCREMENT pour la table `users`
@@ -177,16 +161,10 @@ ALTER TABLE `users`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=12;
 
 --
--- AUTO_INCREMENT pour la table `walloffame`
---
-ALTER TABLE `walloffame`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=15;
-
---
 -- AUTO_INCREMENT pour la table `walloffames`
 --
 ALTER TABLE `walloffames`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=13;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=25;
 
 --
 -- Contraintes pour les tables déchargées
@@ -197,12 +175,6 @@ ALTER TABLE `walloffames`
 --
 ALTER TABLE `mots`
   ADD CONSTRAINT `mots_ibfk_1` FOREIGN KEY (`userId`) REFERENCES `users` (`id`);
-
---
--- Contraintes pour la table `walloffame`
---
-ALTER TABLE `walloffame`
-  ADD CONSTRAINT `walloffame_ibfk_1` FOREIGN KEY (`login`) REFERENCES `users` (`pseudo`);
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;

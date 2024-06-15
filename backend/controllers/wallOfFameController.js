@@ -11,7 +11,12 @@ const endSession = async (sessionId) => {
 };
 
 const createNewSession = async (userId, scores) => {
-  return await WallOfFame.create({ login: userId, Scores: scores });
+  return await WallOfFame.create({
+    login: userId,
+    Scores: scores,
+    createdAt: new Date(),
+    updatedAt: new Date(),
+  });
 };
 
 const startNewSession = async (req, res) => {

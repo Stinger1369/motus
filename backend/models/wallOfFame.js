@@ -21,10 +21,22 @@ const WallOfFame = sequelize.define(
         key: "pseudo",
       },
     },
+    createdAt: {
+      type: DataTypes.DATE,
+      allowNull: false,
+      defaultValue: DataTypes.NOW,
+    },
+    updatedAt: {
+      type: DataTypes.DATE,
+      allowNull: false,
+      defaultValue: DataTypes.NOW,
+    },
   },
   {
-    tableName: "walloffame",
-    timestamps: false,
+    tableName: "walloffames",
+    timestamps: true,
+    updatedAt: "updatedAt",
+    createdAt: "createdAt",
   }
 );
 

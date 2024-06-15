@@ -1,5 +1,21 @@
+// controllers/gameController.js
 const axios = require("axios");
 const WallOfFame = require("../models/walloffame");
+const Mots = require("../models/mots");
+const User = require("../models/user");
+
+const calculateScore = (wordLength, attemptNumber, timeTaken, difficulty) => {
+  const pointsPerLetter = 2;
+  const difficultyPoints = wordLength * pointsPerLetter * difficulty;
+
+  const attemptMultipliers = [1, 0.5, 0.25, 0.125, 0.0625, 0.03125];
+  const attemptPoints =
+    difficultyPoints * attemptMultipliers[attemptNumber - 1];
+
+  const timeBonus = timeTaken < 30 ? difficultyPoints * 0.1 : 0; // 10% bonus for quick responses
+
+  return attemptPoints + timeBonus;
+};
 
 const sessionExists = async (userId) => {
   return await WallOfFame.findOne({ where: { login: userId } });
@@ -10,7 +26,12 @@ const endSession = async (sessionId) => {
 };
 
 const createNewSession = async (userId, scores) => {
-  return await WallOfFame.create({ login: userId, Scores: scores });
+  return await WallOfFame.create({
+    login: userId,
+    Scores: scores,
+    createdAt: new Date(),
+    updatedAt: new Date(),
+  });
 };
 
 const startNewSession = async (userId, scores) => {
@@ -41,11 +62,16 @@ exports.startGame = async (req, res) => {
     console.log("Response from Flask API:", response.data);
     const word = response.data.word;
 
+    // Déterminer la difficulté en fonction de la longueur du mot
+    const difficulty = word.length;
+
     req.session.game = {
       word: word,
       attempts: 0,
       maxAttempts: 6,
       hints: [],
+      startTime: Date.now(), // Start time to calculate the duration later
+      difficulty: difficulty, // Store the difficulty in the game session
     };
 
     await startNewSession(userId, 0); // Create a new session with an initial score of 0
@@ -72,11 +98,16 @@ exports.startRandomGame = async (req, res) => {
     console.log("Response from Flask API:", response.data);
     const word = response.data.word;
 
+    // Déterminer la difficulté en fonction de la longueur du mot
+    const difficulty = word.length;
+
     req.session.game = {
       word: word,
       attempts: 0,
       maxAttempts: 6,
       hints: [],
+      startTime: Date.now(), // Start time to calculate the duration later
+      difficulty: difficulty, // Store the difficulty in the game session
     };
 
     await startNewSession(userId, 0); // Create a new session with an initial score of 0
@@ -89,9 +120,10 @@ exports.startRandomGame = async (req, res) => {
   }
 };
 
-exports.guessWord = (req, res) => {
+exports.guessWord = async (req, res) => {
   const { guess } = req.body;
   const game = req.session.game;
+  const userId = req.user.pseudo; // Assure-toi que l'identifiant de l'utilisateur est passé correctement
 
   console.log("Session during guess:", req.session.game);
   console.log("User's guess:", guess);
@@ -111,15 +143,50 @@ exports.guessWord = (req, res) => {
   game.hints.push({ guess, hints });
 
   if (guess === game.word) {
+    const endTime = Date.now();
+    const timeTaken = (endTime - game.startTime) / 1000; // Time taken in seconds
+    const score = calculateScore(
+      game.word.length,
+      game.attempts,
+      timeTaken,
+      game.difficulty
+    );
+
+    // Enregistrer le score dans `walloffames`
+    await WallOfFame.create({
+      Scores: score,
+      login: req.user.pseudo,
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    });
+
+    // Récupérer l'utilisateur actuel pour obtenir l'ID
+    const user = await User.findOne({ where: { pseudo: userId } });
+
+    if (!user) {
+      return res.status(400).json({ message: "User not found" });
+    }
+
+    // Enregistrer le mot et sa difficulté dans `mots`
+    await Mots.create({
+      word: game.word,
+      longueur: game.word.length,
+      difficulté: game.difficulty,
+      userId: user.id, // Inclure l'ID de l'utilisateur
+    });
+
     console.log("User guessed the word correctly.");
+    clearGameSession(req); // Clear the game session after a correct guess
     return res.json({
       message: "Congratulations! You guessed the word!",
       hints,
+      score: score,
     });
   }
 
   if (game.attempts >= game.maxAttempts) {
     console.log("Game over. The word was:", game.word);
+    clearGameSession(req); // Clear the game session after max attempts reached
     return res.json({ message: `Game over. The word was ${game.word}`, hints });
   }
 
