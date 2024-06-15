@@ -1,7 +1,38 @@
 const axios = require("axios");
+const WallOfFame = require("../models/walloffame");
+
+const sessionExists = async (userId) => {
+  return await WallOfFame.findOne({ where: { login: userId } });
+};
+
+const endSession = async (sessionId) => {
+  return await WallOfFame.destroy({ where: { id: sessionId } });
+};
+
+const createNewSession = async (userId, scores) => {
+  return await WallOfFame.create({ login: userId, Scores: scores });
+};
+
+const startNewSession = async (userId, scores) => {
+  const existingSession = await sessionExists(userId);
+
+  if (existingSession) {
+    await endSession(existingSession.id);
+  }
+
+  return await createNewSession(userId, scores);
+};
+
+const clearGameSession = (req) => {
+  req.session.game = null;
+};
 
 exports.startGame = async (req, res) => {
   try {
+    const userId = req.user.pseudo;
+
+    clearGameSession(req); // Clear any existing game session
+
     const length = req.body.length || 5;
     console.log(`Requesting word with length: ${length}`);
     const response = await axios.get(
@@ -17,6 +48,8 @@ exports.startGame = async (req, res) => {
       hints: [],
     };
 
+    await startNewSession(userId, 0); // Create a new session with an initial score of 0
+
     console.log("Session after starting game:", req.session.game);
     res.json({ message: "Game started", firstLetter: word[0], word: word });
   } catch (error) {
@@ -27,6 +60,10 @@ exports.startGame = async (req, res) => {
 
 exports.startRandomGame = async (req, res) => {
   try {
+    const userId = req.user.pseudo;
+
+    clearGameSession(req); // Clear any existing game session
+
     const length = Math.floor(Math.random() * (15 - 3 + 1)) + 3; // Random number between 3 and 15
     console.log(`Requesting word with length: ${length}`);
     const response = await axios.get(
@@ -42,10 +79,12 @@ exports.startRandomGame = async (req, res) => {
       hints: [],
     };
 
+    await startNewSession(userId, 0); // Create a new session with an initial score of 0
+
     console.log("Session after starting game:", req.session.game);
     res.json({ message: "Game started", firstLetter: word[0], word: word });
   } catch (error) {
-    console.error("Error starting game:", error.message);
+    console.error("Error starting random game:", error.message);
     res.status(500).json({ error: error.message });
   }
 };
@@ -98,8 +137,8 @@ const generateHints = (word, guess) => {
     return acc;
   }, {});
 
-  console.log("Word array:", wordArray); // Ajout du log pour le tableau du mot
-  console.log("Guess array:", guessArray); // Ajout du log pour le tableau du mot deviné
+  console.log("Word array:", wordArray);
+  console.log("Guess array:", guessArray);
 
   for (let i = 0; i < guessArray.length; i++) {
     if (guessArray[i] === wordArray[i]) {
@@ -116,7 +155,7 @@ const generateHints = (word, guess) => {
     }
   }
 
-  console.log("Generated hints:", hints); // Ajout du log pour les indices générés
+  console.log("Generated hints:", hints);
 
   return hints;
 };

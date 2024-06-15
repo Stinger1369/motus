@@ -9,9 +9,15 @@ export const GameProvider = ({ children }) => {
   const [game, setGame] = useState(null);
   const [hints, setHints] = useState([]);
   const [message, setMessage] = useState("");
+  const [isStartingGame, setIsStartingGame] = useState(false);
 
   const startGame = async (difficulty) => {
+    if (isStartingGame) {
+      return;
+    }
+
     try {
+      setIsStartingGame(true);
       const response = await axios.post(
         "http://localhost:3000/api/game/start",
         { length: difficulty },
@@ -20,20 +26,33 @@ export const GameProvider = ({ children }) => {
           withCredentials: true,
         }
       );
-      setGame({
-        word: response.data.word,
-        firstLetter: response.data.firstLetter,
-      });
-      setMessage(response.data.message);
-      setHints([]);
-      console.log("Game started with word:", response.data.word); // Log for debugging
+
+      if (response.data.word) {
+        setGame({
+          word: response.data.word,
+          firstLetter: response.data.firstLetter,
+          attempts: 0,
+          maxAttempts: 6,
+        });
+        setMessage(response.data.message);
+        setHints([]);
+      } else {
+        throw new Error("Invalid response data");
+      }
     } catch (error) {
       console.error("Start game error:", error);
+    } finally {
+      setIsStartingGame(false);
     }
   };
 
   const startRandomGame = async () => {
+    if (isStartingGame) {
+      return;
+    }
+
     try {
+      setIsStartingGame(true);
       const response = await axios.post(
         "http://localhost:3000/api/game/start-random",
         {},
@@ -42,23 +61,28 @@ export const GameProvider = ({ children }) => {
           withCredentials: true,
         }
       );
-      setGame({
-        word: response.data.word,
-        firstLetter: response.data.firstLetter,
-      });
-      setMessage(response.data.message);
-      setHints([]);
-      console.log("Random game started with word:", response.data.word); // Log for debugging
+
+      if (response.data.word) {
+        setGame({
+          word: response.data.word,
+          firstLetter: response.data.firstLetter,
+          attempts: 0,
+          maxAttempts: 6,
+        });
+        setMessage(response.data.message);
+        setHints([]);
+      } else {
+        throw new Error("Invalid response data");
+      }
     } catch (error) {
       console.error("Start random game error:", error);
+    } finally {
+      setIsStartingGame(false);
     }
   };
 
   const handleGuess = async (guess, currentRow) => {
     try {
-      console.log("Current word:", game?.word); // Log for the word to guess
-      console.log("User's guess in handleGuess:", guess); // Log for the guessed word
-
       const response = await axios.post(
         "http://localhost:3000/api/game/guess",
         { guess },
@@ -68,24 +92,43 @@ export const GameProvider = ({ children }) => {
         }
       );
 
-      console.log("Response from guess:", response.data);
+      if (response.data.hints) {
+        const newHints = [...hints];
+        newHints[currentRow] = response.data.hints;
+        setHints(newHints);
+        setMessage(response.data.message);
 
-      const newHints = [...hints];
-      newHints[currentRow] = response.data.hints;
-      setHints(newHints);
-      setMessage(response.data.message);
+       setGame((prevGame) => ({
+         ...prevGame,
+         attempts: (prevGame?.attempts || 0) + 1,
+       }));
 
-      console.log("New hints:", newHints);
-
-      return response.data; // Return the response data
+        return response.data;
+      } else {
+        throw new Error("Invalid response data");
+      }
     } catch (error) {
       console.error("Guess word error:", error);
     }
   };
 
+  const resetGame = () => {
+    setGame(null);
+    setHints([]);
+    setMessage("");
+  };
+
   return (
     <GameContext.Provider
-      value={{ game, hints, message, startGame, startRandomGame, handleGuess }}
+      value={{
+        game,
+        hints,
+        message,
+        startGame,
+        startRandomGame,
+        handleGuess,
+        resetGame,
+      }}
     >
       {children}
     </GameContext.Provider>

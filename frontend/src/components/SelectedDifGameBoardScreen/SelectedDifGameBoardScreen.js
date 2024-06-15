@@ -7,30 +7,14 @@ import GameContext from "../../context/GameContext";
 import "./styles.css";
 
 const SelectedDifGameBoardScreen = () => {
-  const { game, hints, message, handleGuess, startGame } =
+  const { game, hints, message, handleGuess, startGame, resetGame } =
     useContext(GameContext);
   const location = useLocation();
   const navigate = useNavigate();
 
   const [difficulty, setDifficulty] = useState(5);
   const [isValidDifficulty, setIsValidDifficulty] = useState(true);
-
-  useEffect(() => {
-    let initialDifficulty = location.state ? location.state.difficulty : 5;
-
-    initialDifficulty = parseInt(initialDifficulty, 10);
-
-    const validDifficulty =
-      !isNaN(initialDifficulty) &&
-      initialDifficulty >= 3 &&
-      initialDifficulty <= 15;
-    setDifficulty(initialDifficulty);
-    setIsValidDifficulty(validDifficulty);
-
-    if (!validDifficulty) {
-      console.error("Invalid difficulty level:", initialDifficulty);
-    }
-  }, [location.state]);
+  const [gameStarted, setGameStarted] = useState(false);
 
   // Hooks
   const [currentGuess, setCurrentGuess] = useState(
@@ -41,25 +25,44 @@ const SelectedDifGameBoardScreen = () => {
   const [currentRow, setCurrentRow] = useState(0);
   const [gameWon, setGameWon] = useState(false);
   const [gameOver, setGameOver] = useState(false);
-  const [score, setScore] = useState(0); // State to hold the score
+  const [score, setScore] = useState(0);
   const inputRefs = useRef([]);
   const [resetTimer, setResetTimer] = useState(false);
 
   useEffect(() => {
-    if (!isValidDifficulty) {
-      return;
-    }
+    const initialDifficulty = location.state
+      ? parseInt(location.state.difficulty, 10)
+      : 5;
+    const validDifficulty =
+      !isNaN(initialDifficulty) &&
+      initialDifficulty >= 3 &&
+      initialDifficulty <= 15;
 
-    if (game && game.firstLetter) {
-      setCurrentGuess((prevGuesses) => {
-        const newGuesses = [...prevGuesses];
-        newGuesses[0][0] = game.firstLetter.toUpperCase();
-        return newGuesses;
-      });
-      console.log("Playing sound grille_creation");
-      new Audio(Sounds.grille_creation).play();
+    setDifficulty(initialDifficulty);
+    setIsValidDifficulty(validDifficulty);
+
+    if (validDifficulty && !gameStarted) {
+      resetGame();
+      startGame(initialDifficulty).then(() => setGameStarted(true));
+    } else if (!validDifficulty) {
+      console.error("Invalid difficulty level:", initialDifficulty);
     }
-  }, [game, isValidDifficulty]);
+  }, [location.state, resetGame, startGame, gameStarted]);
+
+  useEffect(() => {
+    if (!isValidDifficulty || !gameStarted || !game) return;
+
+    const initialGuesses = Array(6)
+      .fill()
+      .map(() => Array(difficulty).fill(""));
+    if (game.firstLetter) {
+      initialGuesses[0][0] = game.firstLetter.toUpperCase();
+    }
+    setCurrentGuess(initialGuesses);
+
+    console.log("Playing sound grille_creation");
+    new Audio(Sounds.grille_creation).play();
+  }, [game, isValidDifficulty, gameStarted, difficulty]);
 
   useEffect(() => {
     setResetTimer((prev) => !prev);
@@ -77,17 +80,7 @@ const SelectedDifGameBoardScreen = () => {
   };
 
   const onStartGame = () => {
-    setGameWon(false);
-    setGameOver(false);
-    setScore(0); // Reset score
-    startGame(difficulty);
-    setCurrentRow(0);
-    setCurrentGuess(
-      Array(6)
-        .fill()
-        .map(() => Array(difficulty).fill(""))
-    );
-    setResetTimer((prev) => !prev);
+    navigate("/game"); // Redirection vers l'écran de sélection de difficulté
   };
 
   const playSoundForHint = (hint) => {
@@ -102,6 +95,8 @@ const SelectedDifGameBoardScreen = () => {
   };
 
   const onHandleGuess = async () => {
+    if (gameWon || gameOver) return;
+
     const guess = currentGuess[currentRow].join("");
     console.log("User's guess:", guess);
     const response = await handleGuess(guess.toLowerCase(), currentRow);
@@ -116,7 +111,6 @@ const SelectedDifGameBoardScreen = () => {
     const currentHints = response.hints;
     console.log("Hints for current row:", currentHints);
 
-    // Highlight and play sounds for hints
     currentHints.forEach((hint, index) => {
       setTimeout(() => {
         highlightAndPlaySound(currentRow, index, hint);
@@ -124,20 +118,22 @@ const SelectedDifGameBoardScreen = () => {
     });
 
     setTimeout(() => {
-      // Check for victory after processing hints
       if (response.message && response.message.includes("Congratulations")) {
         console.log("Playing victory sound");
         new Audio(Sounds.victory).play();
         setGameWon(true);
-        setScore(response.score); // Set the score
+        setScore(response.score);
         return;
       }
 
       setCurrentGuess((prevGuesses) => {
         const newGuesses = [...prevGuesses];
         currentHints.forEach((hint, index) => {
-          if (hint.status === "correct") {
-            newGuesses[currentRow + 1][index] = hint.letter.toUpperCase();
+          if (hint.status === "correct" || hint.status === "misplaced") {
+            newGuesses[currentRow][index] = hint.letter.toUpperCase();
+            if (currentRow + 1 < 6) {
+              newGuesses[currentRow + 1][index] = hint.letter.toUpperCase();
+            }
           }
         });
         if (
@@ -149,11 +145,9 @@ const SelectedDifGameBoardScreen = () => {
         return newGuesses;
       });
 
-      // Move to next row
       setCurrentRow((prevRow) => prevRow + 1);
     }, 500 * currentHints.length);
 
-    // Handle game over condition
     if (response.message && response.message.includes("Game over")) {
       console.log("Playing error sound");
       new Audio(Sounds.erreur).play();
@@ -182,6 +176,8 @@ const SelectedDifGameBoardScreen = () => {
   };
 
   const handleTimerExpire = async () => {
+    if (gameWon || gameOver) return;
+
     if (!gameWon && !gameOver && currentRow < 6) {
       await onHandleGuess();
       if (currentRow < 5) {
@@ -228,14 +224,12 @@ const SelectedDifGameBoardScreen = () => {
         <div>
           <h3>Félicitations! Vous avez gagné {score} points!</h3>
           <button onClick={onStartGame}>Commencer un nouveau jeu</button>
-          <button onClick={() => navigate("/game")}>Retour</button>
         </div>
       )}
       {gameOver && (
         <div>
           <h3>Le mot correct était : {game.word.toUpperCase()}</h3>
           <button onClick={onStartGame}>Commencer un nouveau jeu</button>
-          <button onClick={() => navigate("/game")}>Retour</button>
         </div>
       )}
     </div>

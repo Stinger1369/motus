@@ -13,6 +13,7 @@ const RandomGameBoardScreen = () => {
 
   const [difficulty, setDifficulty] = useState(5);
   const [isValidDifficulty, setIsValidDifficulty] = useState(true);
+  const [gameStarted, setGameStarted] = useState(false); // Nouvel état pour suivre le démarrage du jeu
 
   // Hooks
   const [currentGuess, setCurrentGuess] = useState(
@@ -29,11 +30,15 @@ const RandomGameBoardScreen = () => {
 
   useEffect(() => {
     const startGame = async () => {
-      await startRandomGame();
+      if (!gameStarted) {
+        console.log("Starting random game on component mount");
+        await startRandomGame();
+        setGameStarted(true); // Marque le jeu comme démarré
+      }
     };
 
     startGame();
-  }, [startRandomGame]);
+  }, [gameStarted, startRandomGame]);
 
   useEffect(() => {
     if (game && game.word) {
@@ -77,6 +82,8 @@ const RandomGameBoardScreen = () => {
   };
 
   const onStartGame = async () => {
+    console.log("Starting new random game");
+    setGameStarted(false); // Permet de redémarrer le jeu
     setGameWon(false);
     setGameOver(false);
     setScore(0); // Reset score

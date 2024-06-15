@@ -8,13 +8,14 @@ import "./styles.css"; // Import the CSS file
 const GameScreen = () => {
   const [difficulty, setDifficulty] = useState("");
   const [randomDifficulty, setRandomDifficulty] = useState(false);
-  const { startGame } = useContext(GameContext);
+  const { startGame, resetGame } = useContext(GameContext);
   const navigate = useNavigate();
 
   const handleStartGame = async () => {
     const finalDifficulty = randomDifficulty
       ? "random"
       : parseInt(difficulty, 10);
+    await resetGame(); // Reset the game before starting a new one
     await startGame(finalDifficulty);
     navigate(randomDifficulty ? "/randomgameboard" : "/selecteddifgameboard", {
       state: { difficulty: finalDifficulty },

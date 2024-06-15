@@ -1,10 +1,38 @@
 const WallOfFame = require("../models/walloffame");
 const User = require("../models/user");
+const { Op } = require("sequelize");
+
+const sessionExists = async (userId) => {
+  return await WallOfFame.findOne({ where: { login: userId } });
+};
+
+const endSession = async (sessionId) => {
+  return await WallOfFame.destroy({ where: { id: sessionId } });
+};
+
+const createNewSession = async (userId, scores) => {
+  return await WallOfFame.create({ login: userId, Scores: scores });
+};
+
+const startNewSession = async (req, res) => {
+  try {
+    const userId = req.user.pseudo;
+    const existingSession = await sessionExists(userId);
+
+    if (existingSession) {
+      await endSession(existingSession.id);
+    }
+
+    const newSession = await createNewSession(userId, req.body.Scores);
+    res.status(201).json(newSession);
+  } catch (error) {
+    res.status(400).json({ error: error.message });
+  }
+};
 
 exports.createEntry = async (req, res) => {
   try {
-    const entry = await WallOfFame.create(req.body);
-    res.status(201).json(entry);
+    await startNewSession(req, res);
   } catch (error) {
     res.status(400).json({ error: error.message });
   }

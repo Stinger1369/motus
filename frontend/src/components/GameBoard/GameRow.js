@@ -29,16 +29,17 @@ const GameRow = ({
         .fill(null)
         .map((_, colIndex) => {
           const hintStatus = hints[rowIndex]?.[colIndex]?.status || "";
+          const letter =
+            hints[rowIndex]?.[colIndex]?.letter ||
+            currentGuess[rowIndex][colIndex];
           return (
             <GameTile
               key={colIndex}
-              value={currentGuess[rowIndex][colIndex]}
+              value={letter}
               onChange={(e) =>
                 handleTileChange(rowIndex, colIndex, e.target.value)
               }
-              disabled={
-                rowIndex !== currentRow || (rowIndex === 0 && colIndex === 0)
-              }
+              disabled={rowIndex !== currentRow}
               hintStatus={hintStatus}
               inputRef={(el) =>
                 (inputRefs.current[rowIndex * difficulty + colIndex] = el)
