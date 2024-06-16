@@ -1,20 +1,17 @@
 const User = require("../models/user");
 
 exports.createUser = async (req, res) => {
-  console.log("Received data:", req.body); // Log the received data
   try {
     const { pseudo, password, numero_secu } = req.body;
 
     // Validation des données
     if (!pseudo || !password || !numero_secu) {
-      console.log("Validation failed:", { pseudo, password, numero_secu }); // Log the validation failure
       return res.status(400).json({ message: "All fields are required." });
     }
 
     const user = await User.create({ pseudo, password, numero_secu });
     res.status(201).json(user);
   } catch (error) {
-    console.error("Create user error:", error); // Log the error
     res.status(400).json({ error: error.message });
   }
 };

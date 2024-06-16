@@ -1,4 +1,3 @@
-// controllers/walloffameController.js
 const WallOfFame = require("../models/walloffame");
 const User = require("../models/user");
 const Mots = require("../models/mots");
@@ -80,6 +79,9 @@ exports.getWinningGames = async (req, res) => {
         Scores: {
           [Op.gt]: 0,
         },
+        seconds: {
+          [Op.gt]: 0, // Filter out entries with 0 seconds
+        },
       },
       order: [["seconds", "ASC"]],
       limit: 10,
@@ -89,14 +91,14 @@ exports.getWinningGames = async (req, res) => {
       winningGames.map(async (game) => {
         const user = await User.findOne({ where: { pseudo: game.login } });
         const mots = await Mots.findOne({
-          where: { userId: user.id, createdAt: game.createdAt },
+          where: { userId: user.id },
         });
         return {
           pseudo: user.pseudo,
           score: game.Scores,
           seconds: game.seconds,
-          wordLength: mots.longueur,
-          moves: calculateMoves(game.Scores), // Assuming you have logic to calculate moves from scores
+          wordLength: mots ? mots.longueur : null,
+          moves: calculateMoves(game.Scores),
         };
       })
     );
@@ -109,6 +111,15 @@ exports.getWinningGames = async (req, res) => {
 
 // Placeholder function for calculating moves from score
 const calculateMoves = (score) => {
-  // Implement your logic to calculate moves
-  return 3;
+  if (score >= 100) {
+    return 1;
+  } else if (score >= 50) {
+    return 2;
+  } else if (score >= 20) {
+    return 3;
+  } else if (score >= 10) {
+    return 4;
+  } else {
+    return 5;
+  }
 };

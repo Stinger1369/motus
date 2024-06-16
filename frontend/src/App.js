@@ -1,4 +1,3 @@
-// App.js
 import React from "react";
 import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
 import HomeScreen from "./pages/HomeScreen/HomeScreen";
@@ -10,7 +9,7 @@ import SelectedDifGameBoardScreen from "./components/SelectedDifGameBoardScreen/
 import User from "./components/User";
 import PrivateRoute from "./components/PrivateRoute";
 import NavBar from "./components/NavBar/NavBar";
-import Leaderboard from "./pages/LeaderboardScreen/LeaderboardScreen";
+import PlayerStats from "./pages/PlayerStats/PlayerStats";
 import Footer from "./components/Footer/Footer";
 import "./App.css";
 
@@ -55,7 +54,7 @@ function App() {
               </PrivateRoute>
             }
           />
-          <Route path="/leaderboard" element={<Leaderboard />} />
+          <Route path="/leaderboard" element={<PlayerStats />} />
         </Routes>
       </div>
       <Footer />

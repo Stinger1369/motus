@@ -6,7 +6,8 @@ import "./index.css";
 import App from "./App";
 import { AuthProvider } from "./context/AuthContext";
 import { UserProvider } from "./context/UserContext";
-import { GameProvider } from "./context/GameContext"; // Ajouter le GameProvider ici
+import { GameProvider } from "./context/GameContext";
+import { MotProvider } from "./context/MotContext"; // Ajouter le MotProvider ici
 
 const container = document.getElementById("root");
 const root = ReactDOM.createRoot(container);
@@ -16,7 +17,9 @@ root.render(
     <AuthProvider>
       <UserProvider>
         <GameProvider>
-          <App />
+          <MotProvider>
+            <App />
+          </MotProvider>
         </GameProvider>
       </UserProvider>
     </AuthProvider>

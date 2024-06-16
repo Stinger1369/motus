@@ -2,12 +2,14 @@ import React, { useContext } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import AuthContext from "../../context/AuthContext";
 import UserContext from "../../context/UserContext";
+import MotContext from "../../context/MotContext"; // Import MotContext
 import logo from "../../assets/images/Motus.webp";
 import "./NavBar.css";
 
 const NavBar = () => {
   const { user, logout } = useContext(AuthContext);
   const { users } = useContext(UserContext);
+  const { fetchWords } = useContext(MotContext); // Get fetchWords from MotContext
   const navigate = useNavigate();
 
   const handleLogout = () => {
@@ -25,6 +27,11 @@ const NavBar = () => {
       return currentUser ? capitalizeFirstLetter(currentUser.pseudo) : null;
     }
     return null;
+  };
+
+  const handleNavigation = (path) => {
+    navigate(path);
+    fetchWords(); // Fetch words when navigating
   };
 
   return (

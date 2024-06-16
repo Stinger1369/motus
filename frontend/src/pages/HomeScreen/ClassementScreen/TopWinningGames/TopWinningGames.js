@@ -1,7 +1,7 @@
 import React, { useEffect, useState, useContext } from "react";
 import axios from "axios";
 import AuthContext from "../../../../context/AuthContext";
-
+import "./TopWinningGames.css"; // Import the CSS file
 
 const TopWinningGames = () => {
   const { user } = useContext(AuthContext);
@@ -27,14 +27,32 @@ const TopWinningGames = () => {
     }
   }, [user]);
 
+  const getFastestGameByUser = (games) => {
+    const userGamesMap = {};
+    games.forEach((game) => {
+      if (
+        !userGamesMap[game.pseudo] ||
+        userGamesMap[game.pseudo].seconds > game.seconds
+      ) {
+        userGamesMap[game.pseudo] = game;
+      }
+    });
+    return Object.values(userGamesMap);
+  };
+
+  const fastestGames = getFastestGameByUser(winningGames)
+    .sort((a, b) => a.seconds - b.seconds)
+    .slice(0, 10);
+
   return (
     <div className="card">
       <h3>Top 10 parties gagnées en minimum de temps</h3>
       <ol>
-        {winningGames.map((game, index) => (
+        {fastestGames.map((game, index) => (
           <li key={index}>
-            {game.pseudo} - Score: {game.score}, {game.moves} coups,{" "}
-            {game.seconds} secondes, (Mot: {game.wordLength} lettres)
+            <span>{game.pseudo}</span> - Score: <span>{game.score}</span>,{" "}
+            {game.moves} coups, {game.seconds} secondes, (Mot:{" "}
+            <span>{game.wordLength}</span> lettres)
           </li>
         ))}
       </ol>

@@ -49,7 +49,7 @@ app.post("/api/users", require("./controllers/userController").createUser);
 // Appliquer authenticateJWT pour les autres routes utilisateur
 app.use("/api/users", authenticateJWT, userRoutes);
 app.use("/api/walloffame", authenticateJWT, wallOfFameRoutes);
-app.use("/api/mots", authenticateJWT, motsRoutes);
+app.use("/api/mots", authenticateJWT, motsRoutes); // Assurez-vous que cette ligne est présente
 app.use("/api/game", authenticateJWT, gameRoutes);
 
 // Middleware pour vérifier la session
