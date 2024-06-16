@@ -1,7 +1,32 @@
 // TopScoreLeaderboard.js
-import React from "react";
+import React, { useEffect, useState, useContext } from "react";
+import axios from "axios";
+import AuthContext from "../../../../context/AuthContext";
 
-const TopScoreLeaderboard = ({ leaderboard }) => {
+const TopScoreLeaderboard = () => {
+  const { user } = useContext(AuthContext);
+  const [leaderboard, setLeaderboard] = useState([]);
+
+  useEffect(() => {
+    const fetchLeaderboard = async () => {
+      try {
+        const response = await axios.get(
+          "http://localhost:3000/api/walloffame",
+          {
+            headers: { Authorization: `Bearer ${user.token}` },
+          }
+        );
+        setLeaderboard(response.data);
+      } catch (error) {
+        console.error("Fetch leaderboard error:", error);
+      }
+    };
+
+    if (user) {
+      fetchLeaderboard();
+    }
+  }, [user]);
+
   return (
     <div className="card">
       <h3>

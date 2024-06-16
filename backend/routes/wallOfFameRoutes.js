@@ -6,5 +6,11 @@ const authenticateJWT = require("../middleware/authMiddleware");
 router.post("/", authenticateJWT, wallOfFameController.createEntry);
 router.get("/:id", authenticateJWT, wallOfFameController.getEntry);
 router.get("/", authenticateJWT, wallOfFameController.getLeaderboard);
+router.get(
+  "/winninggames",
+  authenticateJWT,
+  wallOfFameController.getWinningGames
+);
+
 
 module.exports = router;

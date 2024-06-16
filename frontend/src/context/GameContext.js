@@ -98,10 +98,10 @@ export const GameProvider = ({ children }) => {
         setHints(newHints);
         setMessage(response.data.message);
 
-       setGame((prevGame) => ({
-         ...prevGame,
-         attempts: (prevGame?.attempts || 0) + 1,
-       }));
+        setGame((prevGame) => ({
+          ...prevGame,
+          attempts: (prevGame?.attempts || 0) + 1,
+        }));
 
         return response.data;
       } else {
@@ -109,6 +109,20 @@ export const GameProvider = ({ children }) => {
       }
     } catch (error) {
       console.error("Guess word error:", error);
+    }
+  };
+
+  const endGame = async (score, timeTaken) => {
+    try {
+      await axios.post(
+        "http://localhost:3000/api/game/end",
+        { score, timeTaken },
+        {
+          headers: { Authorization: `Bearer ${user.token}` },
+        }
+      );
+    } catch (error) {
+      console.error("End game error:", error);
     }
   };
 
@@ -128,6 +142,7 @@ export const GameProvider = ({ children }) => {
         startRandomGame,
         handleGuess,
         resetGame,
+        endGame,
       }}
     >
       {children}

@@ -1,9 +1,33 @@
 // UserStats.js
-import React from "react";
+import React, { useEffect, useState, useContext } from "react";
+import axios from "axios";
 import { useNavigate } from "react-router-dom";
+import AuthContext from "../../../../context/AuthContext";
 
-const UserStats = ({ userStats, user }) => {
+const UserStats = () => {
+  const { user } = useContext(AuthContext);
+  const [userStats, setUserStats] = useState(null);
   const navigate = useNavigate();
+
+  useEffect(() => {
+    const fetchUserStats = async () => {
+      try {
+        const response = await axios.get(
+          `http://localhost:3000/api/userstats/${user.id}`,
+          {
+            headers: { Authorization: `Bearer ${user.token}` },
+          }
+        );
+        setUserStats(response.data);
+      } catch (error) {
+        console.error("Fetch user stats error:", error);
+      }
+    };
+
+    if (user) {
+      fetchUserStats();
+    }
+  }, [user]);
 
   return (
     <div className="card">

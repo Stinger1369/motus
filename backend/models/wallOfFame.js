@@ -14,6 +14,10 @@ const WallOfFame = sequelize.define(
       type: DataTypes.INTEGER,
       allowNull: false,
     },
+    seconds: {
+      type: DataTypes.INTEGER,
+      allowNull: false,
+    },
     login: {
       type: DataTypes.STRING,
       references: {

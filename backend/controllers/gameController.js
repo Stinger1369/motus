@@ -1,4 +1,3 @@
-// controllers/gameController.js
 const axios = require("axios");
 const WallOfFame = require("../models/walloffame");
 const Mots = require("../models/mots");
@@ -25,23 +24,24 @@ const endSession = async (sessionId) => {
   return await WallOfFame.destroy({ where: { id: sessionId } });
 };
 
-const createNewSession = async (userId, scores) => {
+const createNewSession = async (userId, scores, seconds) => {
   return await WallOfFame.create({
     login: userId,
     Scores: scores,
+    seconds: seconds,
     createdAt: new Date(),
     updatedAt: new Date(),
   });
 };
 
-const startNewSession = async (userId, scores) => {
+const startNewSession = async (userId, scores, seconds) => {
   const existingSession = await sessionExists(userId);
 
   if (existingSession) {
     await endSession(existingSession.id);
   }
 
-  return await createNewSession(userId, scores);
+  return await createNewSession(userId, scores, seconds);
 };
 
 const clearGameSession = (req) => {
@@ -74,7 +74,7 @@ exports.startGame = async (req, res) => {
       difficulty: difficulty, // Store the difficulty in the game session
     };
 
-    await startNewSession(userId, 0); // Create a new session with an initial score of 0
+    await startNewSession(userId, 0, 0); // Create a new session with an initial score of 0 and seconds 0
 
     console.log("Session after starting game:", req.session.game);
     res.json({ message: "Game started", firstLetter: word[0], word: word });
@@ -110,7 +110,7 @@ exports.startRandomGame = async (req, res) => {
       difficulty: difficulty, // Store the difficulty in the game session
     };
 
-    await startNewSession(userId, 0); // Create a new session with an initial score of 0
+    await startNewSession(userId, 0, 0); // Create a new session with an initial score of 0 and seconds 0
 
     console.log("Session after starting game:", req.session.game);
     res.json({ message: "Game started", firstLetter: word[0], word: word });
@@ -162,6 +162,7 @@ exports.guessWord = async (req, res) => {
 
     await WallOfFame.create({
       Scores: score,
+      seconds: timeTaken, // Adding time taken in seconds
       login: req.user.pseudo,
       createdAt: new Date(),
       updatedAt: new Date(),
@@ -233,3 +234,19 @@ const generateHints = (word, guess) => {
 
   return hints;
 };
+
+exports.endGame = async (req, res) => {
+  try {
+    const { score, timeTaken } = req.body;
+    const userId = req.user.pseudo;
+
+    // Assurez-vous que `timeTaken` est bien utilisé comme `seconds`
+    await startNewSession(userId, score, timeTaken);
+
+    res.status(200).json({ message: "Game data saved successfully." });
+  } catch (error) {
+    res.status(400).json({ error: error.message });
+  }
+};
+
+

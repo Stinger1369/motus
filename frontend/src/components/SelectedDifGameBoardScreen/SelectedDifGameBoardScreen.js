@@ -7,7 +7,7 @@ import GameContext from "../../context/GameContext";
 import "./SelectedDifGameBoardScreen.css";
 
 const SelectedDifGameBoardScreen = () => {
-  const { game, hints, message, handleGuess, startGame, resetGame } =
+  const { game, hints, message, handleGuess, startGame, resetGame, endGame } =
     useContext(GameContext);
   const location = useLocation();
   const navigate = useNavigate();
@@ -15,6 +15,7 @@ const SelectedDifGameBoardScreen = () => {
   const [difficulty, setDifficulty] = useState(5);
   const [isValidDifficulty, setIsValidDifficulty] = useState(true);
   const [gameStarted, setGameStarted] = useState(false);
+  const [startTime, setStartTime] = useState(null);
 
   const [currentGuess, setCurrentGuess] = useState(
     Array(6)
@@ -42,7 +43,10 @@ const SelectedDifGameBoardScreen = () => {
 
     if (validDifficulty && !gameStarted) {
       resetGame();
-      startGame(initialDifficulty).then(() => setGameStarted(true));
+      startGame(initialDifficulty).then(() => {
+        setGameStarted(true);
+        setStartTime(Date.now());
+      });
     } else if (!validDifficulty) {
       console.error("Invalid difficulty level:", initialDifficulty);
     }
@@ -116,12 +120,19 @@ const SelectedDifGameBoardScreen = () => {
       }, 500 * index);
     });
 
-    setTimeout(() => {
+    setTimeout(async () => {
       if (response.message && response.message.includes("Congratulations")) {
         console.log("Playing victory sound");
         new Audio(Sounds.victory).play();
         setGameWon(true);
         setScore(response.score);
+
+        const endTime = Date.now();
+        const timeTaken = (endTime - startTime) / 1000; // Calculate time taken in seconds
+
+        // Send the score and timeTaken to the backend
+        await endGame(response.score, timeTaken);
+
         return;
       }
 
@@ -151,6 +162,12 @@ const SelectedDifGameBoardScreen = () => {
       console.log("Playing error sound");
       new Audio(Sounds.erreur).play();
       setGameOver(true);
+
+      const endTime = Date.now();
+      const timeTaken = (endTime - startTime) / 1000; // Calculate time taken in seconds
+
+      // Send the score and timeTaken to the backend
+      await endGame(response.score, timeTaken);
     }
   };
 
@@ -185,6 +202,12 @@ const SelectedDifGameBoardScreen = () => {
         console.log("Playing error sound");
         new Audio(Sounds.erreur).play();
         setGameOver(true);
+
+        const endTime = Date.now();
+        const timeTaken = (endTime - startTime) / 1000; // Calculate time taken in seconds
+
+        // Send the score and timeTaken to the backend
+        await endGame(score, timeTaken); // Correction here: use the local score state variable
       }
     }
   };

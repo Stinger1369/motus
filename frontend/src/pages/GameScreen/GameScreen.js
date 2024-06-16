@@ -55,10 +55,9 @@ const GameScreen = () => {
           mal placée
         </p>
         <p>
-          <strong className="incorrect">A</strong> La lettre n'est pas
-          présente dans le mot
+          <strong className="incorrect">A</strong> La lettre n'est pas présente
+          dans le mot
         </p>
-
       </div>
     </div>
   );
