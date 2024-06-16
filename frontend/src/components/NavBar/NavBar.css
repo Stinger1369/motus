@@ -1,10 +1,9 @@
 .NavBar {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 0.5rem 2rem;
   background-color: #282c34;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  position: sticky;
+  top: 0;
+  z-index: 1000;
 }
 
 .logo-container {
@@ -14,33 +13,52 @@
 
 .logo {
   height: 50px;
+  transition: transform 0.3s;
+  border-radius: 50%;
 }
 
-.nav-links {
-  list-style-type: none;
-  display: flex;
-  gap: 1.5rem;
-  margin: 0;
-  padding: 0;
+.logo:hover {
+  transform: scale(1.1);
+}
+
+.navbar-text {
+  color: #61dafb;
+  font-size: 1rem;
+  margin-right: 1rem;
 }
 
 .nav-link {
-  color: #61dafb;
-  text-decoration: none;
-  font-size: 1rem;
-  transition: color 0.3s;
+  color: #61dafb !important;
+  transition: color 0.3s, transform 0.3s;
 }
 
-.nav-link:hover,
-.logout-button:hover {
+.nav-link:hover {
   color: #21a1f1 !important;
+  transform: scale(1.1);
 }
 
-.logout-button {
-  background: none;
-  border: none;
+.btn-link {
   color: #61dafb;
-  cursor: pointer;
+}
+
+.btn-link:hover {
+  color: #21a1f1;
+}
+
+.welcome-message {
+  color: #61dafb;
   font-size: 1rem;
-  transition: color 0.3s;
+}
+
+@media (max-width: 768px) {
+  .navbar-nav {
+    text-align: center;
+  }
+
+  .nav-link,
+  .logout-button,
+  .welcome-message {
+    width: 100%;
+    padding: 0.5rem 0;
+  }
 }

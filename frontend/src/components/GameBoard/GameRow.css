@@ -1,6 +1,6 @@
 .board-row {
   display: flex;
-  justify-content: center;
+  justify-content: flex-start; /* Align items to the start to ensure the left side is visible */
   margin-bottom: 10px;
 }
 
@@ -10,4 +10,50 @@
   margin: 5px;
   text-align: center;
   font-size: 24px;
+}
+
+.check-icon-container {
+  width: 30px; /* Set a fixed width for the container */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.check-icon {
+  width: 20px;
+  height: 20px;
+  transition: transform 0.3s;
+}
+
+.check-icon:hover {
+  transform: scale(1.1);
+}
+
+/* Ensure the game board is scrollable horizontally */
+.game-board {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start; /* Align items to the start to ensure the left side is visible */
+  overflow-x: auto;
+  padding: 10px;
+  white-space: nowrap; /* Prevent wrapping */
+}
+
+/* Responsive styling */
+@media (max-width: 768px) {
+  .tile {
+    width: 2rem;
+    height: 2rem;
+    font-size: 1.2rem;
+    line-height: 2rem;
+  }
+}
+
+@media (max-width: 360px) {
+  .tile {
+    width: 0.5rem;
+    height: 0.5rem;
+    font-size: 0.5rem;
+    line-height: 0.5rem;
+  }
 }

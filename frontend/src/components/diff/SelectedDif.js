@@ -3,7 +3,7 @@ import React from "react";
 const SelectedDif = ({ difficulty, setDifficulty, randomDifficulty }) => {
   return (
     <label>
-      Niveau de difficulté :
+      Niveau de difficulté (entre 3 et 15):
       <input
         type="number"
         value={difficulty}

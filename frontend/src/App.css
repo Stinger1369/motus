@@ -1,7 +1,16 @@
+/* App.css */
+html, body, #root {
+  height: 100%;
+  margin: 0;
+  padding: 0;
+}
 .App {
   text-align: center;
 }
-
+body {
+  display: flex;
+  flex-direction: column;
+}
 .App-logo {
   height: 40vmin;
   pointer-events: none;
@@ -35,4 +44,32 @@
   to {
     transform: rotate(360deg);
   }
+}
+
+.navbar-custom {
+  background-color: #343a40;
+}
+
+.navbar-custom .navbar-brand, .navbar-custom .nav-link {
+  color: #ffffff;
+}
+
+.container-custom {
+  margin-top: 20px;
+}
+
+.card-custom {
+  border: none;
+  border-radius: 10px;
+  box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+}
+
+.card-header-custom {
+  background-color: #343a40;
+  color: #ffffff;
+}
+.main-content {
+  flex: 1;
+  padding-bottom: 50px; /* Height of the footer */
+  overflow-y: auto;
 }

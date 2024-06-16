@@ -58,26 +58,14 @@ exports.getEntry = async (req, res) => {
 
 exports.getLeaderboard = async (req, res) => {
   try {
-    const leaderboard = await WallOfFame.findAll({
-      include: {
-        model: User,
-        attributes: ["pseudo"],
-      },
-      attributes: [
-        "login",
-        [sequelize.fn("SUM", sequelize.col("Scores")), "totalScore"],
-      ],
-      group: ["login"],
-      order: [[sequelize.literal("totalScore"), "DESC"]],
+    const leaderboard = await User.findAll({
+      attributes: ["pseudo", "totalScore"],
+      order: [["totalScore", "DESC"]],
     });
 
-    const leaderboardWithPseudo = leaderboard.map((entry) => ({
-      pseudo: entry.User.pseudo,
-      totalScore: entry.dataValues.totalScore,
-    }));
-
-    res.status(200).json(leaderboardWithPseudo);
+    res.status(200).json(leaderboard);
   } catch (error) {
     res.status(400).json({ error: error.message });
   }
 };
+

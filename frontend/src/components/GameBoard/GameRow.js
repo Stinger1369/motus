@@ -1,5 +1,8 @@
 import React, { useEffect } from "react";
 import GameTile from "./GameTitle";
+import "./GameRow.css";
+import blackCheck from "../../assets/images/Black_check.svg";
+import greenCheck from "../../assets/images/Green_check.svg";
 
 const GameRow = ({
   rowIndex,
@@ -47,11 +50,19 @@ const GameRow = ({
             />
           );
         })}
-      {rowIndex === currentRow && !gameWon && (
-        <button onClick={onHandleGuess} disabled={!isCurrentRowComplete()}>
-          Proposer
-        </button>
-      )}
+      <div className="check-icon-container">
+        {rowIndex === currentRow && !gameWon && (
+          <img
+            src={isCurrentRowComplete() ? greenCheck : blackCheck}
+            alt={isCurrentRowComplete() ? "Green Check" : "Black Check"}
+            onClick={isCurrentRowComplete() ? onHandleGuess : null}
+            className="check-icon"
+            style={{
+              cursor: isCurrentRowComplete() ? "pointer" : "not-allowed",
+            }}
+          />
+        )}
+      </div>
     </div>
   );
 };

@@ -11,3 +11,18 @@ code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
     monospace;
 }
+.main-content {
+  margin: 0 15px; /* Ajustez la marge selon vos besoins */
+}
+
+@media (min-width: 768px) {
+  .main-content {
+    margin: 0 50px; /* Plus grande marge pour les écrans de taille moyenne et plus */
+  }
+}
+
+@media (min-width: 1200px) {
+  .main-content {
+    margin: 0 100px; /* Encore plus grande marge pour les grands écrans */
+  }
+}

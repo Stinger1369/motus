@@ -4,7 +4,7 @@ import Sounds from "../sounds";
 import Timer from "../GameBoard/Timer/Timer";
 import GameRow from "../GameBoard/GameRow";
 import GameContext from "../../context/GameContext";
-import "./styles.css";
+import "./SelectedDifGameBoardScreen.css";
 
 const SelectedDifGameBoardScreen = () => {
   const { game, hints, message, handleGuess, startGame, resetGame } =
@@ -16,7 +16,6 @@ const SelectedDifGameBoardScreen = () => {
   const [isValidDifficulty, setIsValidDifficulty] = useState(true);
   const [gameStarted, setGameStarted] = useState(false);
 
-  // Hooks
   const [currentGuess, setCurrentGuess] = useState(
     Array(6)
       .fill()
@@ -80,7 +79,7 @@ const SelectedDifGameBoardScreen = () => {
   };
 
   const onStartGame = () => {
-    navigate("/game"); // Redirection vers l'écran de sélection de difficulté
+    navigate("/game");
   };
 
   const playSoundForHint = (hint) => {

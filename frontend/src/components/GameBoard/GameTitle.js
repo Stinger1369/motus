@@ -1,4 +1,5 @@
 import React from "react";
+import "./GameTile.css";
 
 const GameTile = ({ value, onChange, disabled, hintStatus, inputRef }) => {
   return (

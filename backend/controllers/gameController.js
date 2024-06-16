@@ -120,10 +120,18 @@ exports.startRandomGame = async (req, res) => {
   }
 };
 
+const updateTotalScore = async (userId, score) => {
+  const user = await User.findOne({ where: { pseudo: userId } });
+  if (user) {
+    user.totalScore += score;
+    await user.save();
+  }
+};
+
 exports.guessWord = async (req, res) => {
   const { guess } = req.body;
   const game = req.session.game;
-  const userId = req.user.pseudo; // Assure-toi que l'identifiant de l'utilisateur est passé correctement
+  const userId = req.user.pseudo;
 
   console.log("Session during guess:", req.session.game);
   console.log("User's guess:", guess);
@@ -152,7 +160,6 @@ exports.guessWord = async (req, res) => {
       game.difficulty
     );
 
-    // Enregistrer le score dans `walloffames`
     await WallOfFame.create({
       Scores: score,
       login: req.user.pseudo,
@@ -160,23 +167,23 @@ exports.guessWord = async (req, res) => {
       updatedAt: new Date(),
     });
 
-    // Récupérer l'utilisateur actuel pour obtenir l'ID
     const user = await User.findOne({ where: { pseudo: userId } });
 
     if (!user) {
       return res.status(400).json({ message: "User not found" });
     }
 
-    // Enregistrer le mot et sa difficulté dans `mots`
     await Mots.create({
       word: game.word,
       longueur: game.word.length,
       difficulté: game.difficulty,
-      userId: user.id, // Inclure l'ID de l'utilisateur
+      userId: user.id,
     });
 
+    await updateTotalScore(userId, score);
+
     console.log("User guessed the word correctly.");
-    clearGameSession(req); // Clear the game session after a correct guess
+    clearGameSession(req);
     return res.json({
       message: "Congratulations! You guessed the word!",
       hints,
@@ -186,7 +193,7 @@ exports.guessWord = async (req, res) => {
 
   if (game.attempts >= game.maxAttempts) {
     console.log("Game over. The word was:", game.word);
-    clearGameSession(req); // Clear the game session after max attempts reached
+    clearGameSession(req);
     return res.json({ message: `Game over. The word was ${game.word}`, hints });
   }
 
