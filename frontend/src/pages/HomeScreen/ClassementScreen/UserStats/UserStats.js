@@ -12,17 +12,17 @@ const UserStats = () => {
   const { words, fetchWords } = useContext(MotContext);
   const [userStats, setUserStats] = useState(null);
   const navigate = useNavigate();
-  const [isLoaded, setIsLoaded] = useState(false); // New state to track loading
+  const [isLoaded, setIsLoaded] = useState(false);
 
   const fetchUserStats = async () => {
     try {
       const userStatsData = await getUser(user.id);
       setUserStats(userStatsData);
-      await fetchWords(); // Make sure this is awaited
+      await fetchWords();
     } catch (error) {
       console.error("Fetch user stats error:", error);
     } finally {
-      setIsLoaded(true); // Set loading to true after fetch
+      setIsLoaded(true);
     }
   };
 
@@ -30,7 +30,7 @@ const UserStats = () => {
     if (user && !isLoaded) {
       fetchUserStats();
     }
-  }, [user, getUser]); // Do not include fetchWords in dependencies
+  }, [user, getUser]);
 
   const calculateAverageTime = (games) => {
     if (games.length === 0) return 0;
@@ -39,6 +39,15 @@ const UserStats = () => {
   };
 
   const averageTime = calculateAverageTime(words);
+
+  if (!user) {
+    return (
+      <p>
+        Veuillez vous connecter pour voir vos statistiques et commencer une
+        nouvelle partie.
+      </p>
+    );
+  }
 
   return (
     <div className="card">

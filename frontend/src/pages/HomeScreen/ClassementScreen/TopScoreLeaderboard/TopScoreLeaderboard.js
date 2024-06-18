@@ -1,4 +1,3 @@
-// TopScoreLeaderboard.js
 import React, { useEffect, useState, useContext } from "react";
 import axios from "axios";
 import AuthContext from "../../../../context/AuthContext";
@@ -26,6 +25,10 @@ const TopScoreLeaderboard = () => {
       fetchLeaderboard();
     }
   }, [user]);
+
+  if (!user) {
+    return <p>Veuillez vous connecter pour voir le classement des scores.</p>;
+  }
 
   return (
     <div className="card">

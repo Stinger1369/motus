@@ -44,6 +44,14 @@ const TopWinningGames = () => {
     .sort((a, b) => a.seconds - b.seconds)
     .slice(0, 10);
 
+  if (!user) {
+    return (
+      <p>
+        Veuillez vous connecter pour voir le classement des parties gagnées.
+      </p>
+    );
+  }
+
   return (
     <div className="card">
       <h3>Top 10 parties gagnées en minimum de temps</h3>
